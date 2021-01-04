@@ -1,11 +1,11 @@
 abstract type AbstractPolytope{N} end
 
-struct FullPolytope{N,V<:AbstractVector{<:AbstractVector{<:AbstractVector{Int}}}} <: AbstractPolytope{N}
+struct FullPolytope{N,V<:AbstractVector} <: AbstractPolytope{N}
     graph::SimpleDiGraph{Int}
     connectivity::V
 end
 
-FullPolytope(g::SimpleDiGraph, connectivity::AbstractVector{<:AbstractVector{<:AbstractVector{<:Integer}}}) = FullPolytope{length(connectivity),typeof(connectivity)}(g, connectivity)
+FullPolytope(g::SimpleDiGraph, connectivity::AbstractVector) = FullPolytope{length(connectivity),typeof(connectivity)}(g, connectivity)
 
 """
 Build a `FullPolytope` from the structure provided in `indices`.
@@ -24,14 +24,14 @@ julia> FullPolytope(4,
     [(1,), (2,)]) # faces (made from a closed chain -> PolySurface with no inner chains)
 ```
 """
-function FullPolytope(connectivity::AbstractVector{<:AbstractVector{<:AbstractVector{Int}}})
+function FullPolytope(connectivity::Vector{<:AbstractVector})
     faces_starts = start_indices(connectivity)
     g = SimpleDiGraph(last(faces_starts) + length(last(connectivity)))
     add_faces!.(Ref(g), faces_starts, vcat(0, faces_starts[1:end-1]), connectivity)
     FullPolytope(g, connectivity)
 end
 
-FullPolytope(connectivity::AbstractVector{<:AbstractVector{Int}}...) = FullPolytope(collect(connectivity))
+FullPolytope(connectivity::AbstractVector...) = FullPolytope(collect(connectivity))
 
 function add_faces!(g::SimpleDiGraph, src_start::Integer, dst_start::Integer, faces)
     for (src, dst_edge) ∈ enumerate(faces)
