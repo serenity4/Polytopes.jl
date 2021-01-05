@@ -2,10 +2,10 @@ module Polytopes
 
 using LightGraphs
 
-include("full_polytope.jl")
+include("polytope.jl")
 
 export
-        FullPolytope,
+        Polytope,
         paramdim,
         faces,
         facets

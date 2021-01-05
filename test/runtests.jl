@@ -3,7 +3,7 @@ using LightGraphs
 using Test
 
 @testset "Polytopes.jl" begin
-    p = FullPolytope([[1, 2], [2, 3], [3, 1], [2, 3], [3, 4], [4, 2]], [[1, 2, 3], [4, 5, 6]])
+    p = Polytope([[1, 2], [2, 3], [3, 1], [2, 3], [3, 4], [4, 2]], [[1, 2, 3], [4, 5, 6]])
     @test faces(p, 0) == 1:4
     @test faces(p, 1) == facets(p) == 5:10
     @test faces(p, 2) == 11:12
