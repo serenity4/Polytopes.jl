@@ -4,6 +4,8 @@ using Test
 
 @testset "Polytopes.jl" begin
     p = Polytope([[1, 2], [2, 3], [3, 1], [2, 3], [3, 4], [4, 2]], [[1, 2, 3], [4, 5, 6]])
+    @test paramdim(p) == 2
+    @test nverts(p) == 4
     @test faces(p, 0) == 1:4
     @test faces(p, 1) == facets(p) == 5:10
     @test faces(p, 2) == 11:12
@@ -27,4 +29,10 @@ using Test
         Edge(12, 9),
         Edge(12, 10),
     ])
+    @test string(p) == "2-polytope with 4 vertices, 6 edges"
+
+    gp = GeometricPolytope(p, map(x -> Vertex(randn(3)), 1:nverts(p)))
+    @test embeddim(gp) == 3
+    @test gp.polytope == p
+    @test string(gp) == "3-dimensional geometric 2-polytope with 4 vertices, 6 edges"
 end
