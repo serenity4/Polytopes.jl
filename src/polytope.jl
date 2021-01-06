@@ -6,17 +6,16 @@ of a polytope as a partially ordered set.
 Only when a polytope is associated with vertex data can we visually represent a possible _realization_ of this particular
 polytope. Such a realization is called a geometric polytope.
 """
-struct Polytope{N,V<:AbstractVector}
+struct Polytope{N}
     graph::SimpleDiGraph{Int}
-    connectivity::V
     nverts::Int
     start_indices::Vector{Int}
 end
 
-const Polygon{V} = Polytope{2,V}
-const Polyhedron{V} = Polytope{3,V}
+const Polygon = Polytope{2}
+const Polyhedron = Polytope{3}
 
-Polytope(g::SimpleDiGraph, connectivity::AbstractVector, nverts::Integer, start_indices::AbstractVector{<:Integer}) = Polytope{length(connectivity),typeof(connectivity)}(g, connectivity, nverts, start_indices)
+Polytope(g::SimpleDiGraph, rank::Integer, nverts::Integer, start_indices::AbstractVector{<:Integer}) = Polytope{rank}(g, nverts, start_indices)
 
 """
 Build a `Polytope` from the structure provided in `indices`.
@@ -40,7 +39,7 @@ function Polytope(connectivity::Vector{<:AbstractVector})
     nnodes = last(faces_starts) + length(last(connectivity))
     g = SimpleDiGraph(nnodes)
     add_faces!.(Ref(g), faces_starts, vcat(0, faces_starts[1:end-1]), connectivity)
-    Polytope(g, connectivity, first(faces_starts), faces_starts)
+    Polytope(g, length(connectivity), first(faces_starts), faces_starts)
 end
 
 Polytope(connectivity::AbstractVector...) = Polytope(collect(connectivity))
@@ -64,7 +63,7 @@ paramdim(p::Polytope) = paramdim(typeof(p))
 
 function faces(p::Polytope, k)
     faces_starts = start_indices(p)
-    all_start_indices = vcat(0, faces_starts, last(faces_starts) + length(last(p.connectivity)))
+    all_start_indices = vcat(0, faces_starts, nv(p.graph))
     (all_start_indices[k + 1] + 1):all_start_indices[k + 2]
 end
 
