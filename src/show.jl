@@ -1,7 +1,7 @@
 function Base.show(io::IO, p::Polytope)
     diff = 0
-    print(io, paramdim(p), "-polytope with")
-    for (i, j) ∈ enumerate(start_indices(p))
+    print(io, rank(p), "-polytope with")
+    for (i, j) ∈ enumerate(vcat(start_indices(p), nv(p.graph)))
         n = j - diff
         k = i - 1
         noun = n == 1 && k == 0 ? "vertex" : n == 1 && k == 1 ? "edge" : n == 1 && k == 2 ? "face" : k == 0 ? "vertices" : k == 1 ? "edges" : k == 2 ? "faces" : n == 1 ? string(k, "-face") : string(k, "-faces")

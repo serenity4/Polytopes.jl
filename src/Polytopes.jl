@@ -10,7 +10,7 @@ export
         Polytope,
         Polygon,
         Polyhedron,
-        paramdim,
+        rank,
         nverts,
         faces,
         facets,

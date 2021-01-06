@@ -15,7 +15,7 @@ end
 const Polygon = Polytope{2}
 const Polyhedron = Polytope{3}
 
-Polytope(g::SimpleDiGraph, rank::Integer, nverts::Integer, start_indices::AbstractVector{<:Integer}) = Polytope{rank}(g, nverts, start_indices)
+Polytope(g::SimpleDiGraph, k::Integer, nverts::Integer, start_indices::AbstractVector{<:Integer}) = Polytope{k}(g, nverts, start_indices)
 
 """
 Build a `Polytope` from the structure provided in `indices`.
@@ -44,6 +44,9 @@ end
 
 Polytope(connectivity::AbstractVector...) = Polytope(collect(connectivity))
 
+Base.:(==)(x::Polytope{K1}, y::Polytope{K2}) where {K1,K2} = false
+Base.:(==)(x::Polytope{K}, y::Polytope{K}) where {K} = x.graph == y.graph && nverts(x) == nverts(y) && start_indices(x) == start_indices(y)
+
 function add_faces!(g::SimpleDiGraph, src_start::Integer, dst_start::Integer, faces)
     for (src, dst_edge) ∈ enumerate(faces)
         for dst ∈ dst_edge
@@ -58,16 +61,17 @@ start_indices(p::Polytope) = p.start_indices
 
 nverts(p::Polytope) = p.nverts
 
-paramdim(::Type{<:Polytope{N}}) where {N} = N
-paramdim(p::Polytope) = paramdim(typeof(p))
+rank(::Type{<:Polytope{N}}) where {N} = N
+rank(p::Polytope) = rank(typeof(p))
 
-function faces(p::Polytope, k)
-    faces_starts = start_indices(p)
-    all_start_indices = vcat(0, faces_starts, nv(p.graph))
-    (all_start_indices[k + 1] + 1):all_start_indices[k + 2]
+function polytope_range(p::Polytope, k::Integer)
+    @assert k ≠ rank(p)
+    1:(start_indices(p)[k+1])
 end
 
-facets(p::Polytope) = faces(p, paramdim(p) - 1)
+faces(p::Polytope, k) = k == rank(p) ? p : Polytope(p.graph[polytope_range(p, k)], k, nverts(p), start_indices(p)[1:k])
+
+facets(p::Polytope) = faces(p, rank(p) - 1)
 
 """
 Vertex associated with a specific position in space.
